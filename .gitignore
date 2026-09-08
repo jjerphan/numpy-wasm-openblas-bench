@@ -1,0 +1,10 @@
+work/
+mount/
+.empack-cache/
+__pycache__/
+*.pyc
+*.wasm
+results/*.jsonl
+results/*.html
+results/*.log
+results/*.meta.json
