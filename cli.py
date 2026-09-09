@@ -1,0 +1,124 @@
+"""Pixi entry point: run labelled benches and write results/report.html."""
+
+from __future__ import annotations
+
+import argparse
+import subprocess
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+PIXI_ENVS = HERE / ".pixi" / "envs"
+RESULTS = HERE / "results"
+
+CONFIGS = ("noblas", "ob034", "obdev", "pyodide", "cf64")
+
+
+def require_env(name: str) -> Path:
+    path = PIXI_ENVS / name
+    if not path.is_dir():
+        raise SystemExit(f"missing prefix {path}\nRun: pixi run setup")
+    return path
+
+
+def python_script(script: str, argv: list[str]) -> int:
+    return subprocess.call([sys.executable, str(HERE / script), *argv])
+
+
+def bench(config: str, full: bool, rest: list[str]) -> int:
+    if config == "pyodide":
+        return python_script("run_pyodide.py", ["--no-compare", *rest])
+    if config == "cf64":
+        env = require_env("cf64")
+        return python_script(
+            "run_native.py",
+            [
+                "--env",
+                str(env),
+                "--python",
+                str(env / "bin" / "python"),
+                "--label",
+                "cf64",
+                *rest,
+            ],
+        )
+    env = require_env(config)
+    argv = ["--label", config, "--no-compare", *rest]
+    if config == "noblas":
+        argv = [
+            "--only",
+            "noblas",
+            "--noblas-env",
+            str(env),
+            *argv,
+        ]
+        if not full:
+            argv.extend(["--skip-l3-n", "1024"])
+    else:
+        argv = [
+            "--only",
+            "openblas",
+            "--openblas-env",
+            str(env),
+            *argv,
+        ]
+    return python_script("run_host.py", argv)
+
+
+def convert_jsonls() -> None:
+    from run_host import jsonl_to_csv
+
+    for stem in CONFIGS:
+        jsonl = RESULTS / f"{stem}.jsonl"
+        if jsonl.exists():
+            jsonl_to_csv(jsonl, RESULTS / f"{stem}.csv")
+    openblas = RESULTS / "openblas.jsonl"
+    if openblas.exists() and not (RESULTS / "ob034.jsonl").exists():
+        jsonl_to_csv(openblas, RESULTS / "openblas.csv")
+
+
+def report() -> int:
+    from compare import write_combined_index
+
+    RESULTS.mkdir(parents=True, exist_ok=True)
+    convert_jsonls()
+    write_combined_index(RESULTS)
+    html = RESULTS / "report.html"
+    if html.exists():
+        print(f"report: {html}")
+    return 0
+
+
+def all_configs(full: bool, rest: list[str]) -> int:
+    for config in CONFIGS:
+        print(f"=== bench {config} ===", flush=True)
+        rc = bench(config, full, rest)
+        if rc != 0:
+            return rc
+    return report()
+
+
+def main(argv: list[str] | None = None) -> int:
+    p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument("command", choices=("bench", "report", "all"))
+    p.add_argument("config", nargs="?", choices=CONFIGS)
+    p.add_argument(
+        "--full",
+        action="store_true",
+        help="include no-BLAS Level-3 GEMM at n=1024 (slow)",
+    )
+    args, rest = p.parse_known_args(argv)
+    if args.command == "report":
+        return report()
+    if args.command == "all":
+        return all_configs(args.full, rest)
+    if args.command == "bench":
+        if not args.config:
+            p.error("bench requires a config: " + ", ".join(CONFIGS))
+        return bench(args.config, args.full, rest)
+    p.error(args.command)
+    return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

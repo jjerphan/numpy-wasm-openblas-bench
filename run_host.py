@@ -13,11 +13,29 @@ from contextlib import closing
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-DEFAULT_HOST = Path.home() / ".local" / "miniforge3" / "envs" / "np-wasm-host"
-DEFAULT_OPENBLAS = Path.home() / ".local" / "miniforge3" / "envs" / "np-wasm-openblas"
-DEFAULT_NOBLAS = Path.home() / ".local" / "miniforge3" / "envs" / "np-wasm-noblas"
+PIXI_ENVS = HERE / ".pixi" / "envs"
+DEFAULT_HOST = PIXI_ENVS / "default"
+DEFAULT_OPENBLAS = PIXI_ENVS / "ob034"
+DEFAULT_NOBLAS = PIXI_ENVS / "noblas"
 RESULTS = HERE / "results"
 WORK = HERE / "work"
+
+L3_OPS = (
+    "gemm",
+    "gemm_f",
+    "syrk",
+    "batched_matmul",
+    "gemm_dot",
+    "matmul",
+    "tensordot",
+    "multi_dot",
+    "matrix_power",
+)
+L3_DTYPES = ("float32", "float64")
+
+
+def l3_skip_rows(n: int) -> list[list]:
+    return [[op, n, dt] for op in L3_OPS for dt in L3_DTYPES]
 
 # pyjs-code-runner hardcodes a 4-minute Playwright timeout; large GEMM exceeds that.
 PLAYWRIGHT_TIMEOUT_MS = 0  # disable
@@ -235,6 +253,7 @@ def run_env(
     warmup: int,
     samples: int,
     resume: bool,
+    extra_skip: list | None = None,
 ) -> dict:
     mount = HERE / "mount"
     if mount.exists():
@@ -242,6 +261,8 @@ def run_env(
     mount.mkdir()
     shutil.copyfile(HERE / "bench.py", mount / "bench.py")
     skip = load_done(jsonl) if resume else []
+    if extra_skip:
+        skip = list(skip) + list(extra_skip)
     (mount / "config.json").write_text(
         json.dumps(
             {
@@ -340,7 +361,16 @@ def main() -> int:
         help="after converting, compare the labelled OpenBLAS CSV to results/pyodide.csv",
     )
     p.add_argument("--no-compare", action="store_true", help="skip OpenBLAS vs no-BLAS HTML")
+    p.add_argument(
+        "--skip-l3-n",
+        type=int,
+        action="append",
+        default=[],
+        metavar="N",
+        help="skip Level-3 (GEMM-family) ops at size N (repeatable)",
+    )
     args = p.parse_args()
+    extra_skip = [row for n in args.skip_l3_n for row in l3_skip_rows(n)]
 
     RESULTS.mkdir(parents=True, exist_ok=True)
     metas = {}
@@ -366,6 +396,7 @@ def main() -> int:
                 args.warmup,
                 args.samples,
                 args.resume,
+                extra_skip=extra_skip,
             )
 
     # Always convert jsonls if present so --only / --resume cannot

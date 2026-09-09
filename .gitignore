@@ -1,6 +1,8 @@
 work/
 mount/
 .empack-cache/
+.pixi/
+.playwright/
 __pycache__/
 *.pyc
 *.wasm

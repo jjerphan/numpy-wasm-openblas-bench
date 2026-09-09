@@ -169,15 +169,14 @@ def _cmp_payload(openblas_csv: Path, other_csv: Path, openblas_meta: Path | None
     groups = group_geomeans(rows)
     om = load_meta(openblas_meta)
     nm = load_meta(other_meta)
-    names = {
-        "openblas": "emscripten-forge NumPy",
-        "pyodide": "Pyodide NumPy",
-        "noblas": "emscripten-forge NumPy (no-BLAS)",
-    }
+    from report import LABEL_NAMES
+
+    left_stem = str(om.get("label") or openblas_csv.stem)
+    right_stem = str(nm.get("label") or other_csv.stem)
     return {
-        "id": str(nm.get("label") or other_csv.stem),
-        "left_label": names.get(str(om.get("label") or "openblas"), "OpenBLAS numpy"),
-        "right_label": names.get(str(nm.get("label") or other_csv.stem), other_csv.stem),
+        "id": f"{left_stem}-vs-{right_stem}",
+        "left_label": LABEL_NAMES.get(left_stem, left_stem),
+        "right_label": LABEL_NAMES.get(right_stem, right_stem),
         "openblas": om,
         "noblas": nm,
         "groups": groups,
@@ -185,40 +184,59 @@ def _cmp_payload(openblas_csv: Path, other_csv: Path, openblas_meta: Path | None
     }
 
 
+COMPARE_PAIRS = (
+    ("ob034", "noblas"),
+    ("ob034", "pyodide"),
+    ("ob034", "cf64"),
+    ("obdev", "ob034"),
+    ("obdev", "pyodide"),
+    ("obdev", "cf64"),
+)
+
+_ALIASES = {"ob034": ("openblas",)}
+
+
+def _labelled_csv(results: Path, stem: str) -> Path | None:
+    path = results / f"{stem}.csv"
+    if path.exists():
+        return path
+    for alias in _ALIASES.get(stem, ()):
+        alt = results / f"{alias}.csv"
+        if alt.exists():
+            return alt
+    return None
+
+
+def _labelled_meta(results: Path, stem: str) -> Path | None:
+    path = results / f"{stem}.meta.json"
+    if path.exists():
+        return path
+    for alias in _ALIASES.get(stem, ()):
+        alt = results / f"{alias}.meta.json"
+        if alt.exists():
+            return alt
+    return None
+
+
 def write_combined_index(results: Path) -> None:
     from report import write_report
 
     parts = []
-    noblas_csv = results / "compare.csv"
-    pyodide_csv = results / "compare_pyodide.csv"
-    if (results / "openblas.csv").exists() and (results / "noblas.csv").exists():
-        parts.append(
-            _cmp_payload(
-                results / "openblas.csv",
-                results / "noblas.csv",
-                results / "openblas.meta.json",
-                results / "noblas.meta.json",
-            )
+    for left, right in COMPARE_PAIRS:
+        left_csv = _labelled_csv(results, left)
+        right_csv = _labelled_csv(results, right)
+        if left_csv is None or right_csv is None:
+            continue
+        payload = _cmp_payload(
+            left_csv,
+            right_csv,
+            _labelled_meta(results, left),
+            _labelled_meta(results, right),
         )
-    if (results / "openblas_n1024.csv").exists() and (results / "pyodide.csv").exists():
-        parts.append(
-            _cmp_payload(
-                results / "openblas_n1024.csv",
-                results / "pyodide.csv",
-                results / "openblas.meta.json",
-                results / "pyodide.meta.json",
-            )
-        )
-    elif pyodide_csv.exists() and (results / "openblas.csv").exists() and (results / "pyodide.csv").exists():
-        parts.append(
-            _cmp_payload(
-                results / "openblas.csv",
-                results / "pyodide.csv",
-                results / "openblas.meta.json",
-                results / "pyodide.meta.json",
-            )
-        )
+        payload["id"] = f"{left}-vs-{right}"
+        parts.append(payload)
     if not parts:
+        print(f"no labelled CSV pairs in {results}; nothing to report")
         return
     write_report(
         results / "report.html",

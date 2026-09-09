@@ -1,0 +1,129 @@
+[workspace]
+name = "numpy-wasm-openblas-bench"
+version = "0.1.0"
+description = "Reproduce NumPy wasm OpenBLAS benches and write a self-contained HTML report."
+channels = ["conda-forge"]
+platforms = ["linux-64", "emscripten-wasm32"]
+
+[environments]
+default = { features = ["host"] }
+noblas = { features = ["wasm-noblas"], no-default-feature = true }
+ob034 = { features = ["wasm-ob034"], no-default-feature = true }
+obdev = { features = ["wasm-obdev"], no-default-feature = true }
+cf64 = { features = ["native"], no-default-feature = true }
+
+[feature.host]
+platforms = ["linux-64"]
+channels = ["conda-forge"]
+
+[feature.host.dependencies]
+python = "3.12.*"
+pyjs_code_runner = ">=3.2.0"
+empack = "*"
+playwright-python = "*"
+util-linux = "*"
+
+[feature.host.activation.env]
+PLAYWRIGHT_BROWSERS_PATH = "$PIXI_PROJECT_ROOT/.playwright"
+
+[feature.host.tasks.install-envs]
+cmd = "pixi install --all"
+
+[feature.host.tasks.setup]
+cmd = "python -m playwright install chromium"
+depends-on = ["install-envs"]
+
+[feature.host.tasks.bench-noblas]
+cmd = "python cli.py bench noblas"
+depends-on = ["install-noblas"]
+
+[feature.host.tasks.install-noblas]
+cmd = "pixi install -e noblas"
+
+[feature.host.tasks.bench-ob034]
+cmd = "python cli.py bench ob034"
+depends-on = ["install-ob034"]
+
+[feature.host.tasks.install-ob034]
+cmd = "pixi install -e ob034"
+
+[feature.host.tasks.bench-obdev]
+cmd = "python cli.py bench obdev"
+depends-on = ["install-obdev"]
+
+[feature.host.tasks.install-obdev]
+cmd = "pixi install -e obdev"
+
+[feature.host.tasks.bench-pyodide]
+cmd = "python cli.py bench pyodide"
+
+[feature.host.tasks.install-cf64]
+cmd = "pixi install -e cf64"
+
+[feature.host.tasks.bench-cf64]
+cmd = "python cli.py bench cf64"
+depends-on = ["install-cf64"]
+
+[feature.host.tasks.report]
+cmd = "python cli.py report"
+
+[feature.host.tasks.all]
+cmd = "python cli.py all"
+depends-on = ["setup"]
+
+[feature.wasm-noblas]
+platforms = ["emscripten-wasm32"]
+channel-priority = "disabled"
+channels = [
+    "https://prefix.dev/emscripten-forge-4x",
+    "conda-forge",
+]
+
+[feature.wasm-noblas.dependencies]
+python = "3.13.*"
+python_abi = { version = "3.13.*", channel = "conda-forge" }
+numpy = "2.5.2.*"
+pyjs = "*"
+
+[feature.wasm-ob034]
+platforms = ["emscripten-wasm32"]
+channel-priority = "disabled"
+channels = [
+    "https://prefix.dev/emscripten-forge-4x-experimental",
+    "https://prefix.dev/emscripten-forge-4x",
+    "conda-forge",
+]
+
+[feature.wasm-ob034.dependencies]
+python = "3.13.*"
+python_abi = { version = "3.13.*", channel = "conda-forge" }
+# Build pin selects the experimental NumPy that links OpenBLAS (4x 2.5.3 does not).
+numpy = { version = "2.5.3.*", build = "py313h9242c33_0" }
+openblas = "0.3.34.*"
+pyjs = "*"
+
+[feature.wasm-obdev]
+platforms = ["emscripten-wasm32"]
+channel-priority = "disabled"
+channels = [
+    "https://prefix.dev/emscripten-forge-4x-experimental",
+    "https://prefix.dev/emscripten-forge-4x",
+    "conda-forge",
+]
+
+[feature.wasm-obdev.dependencies]
+python = "3.13.*"
+python_abi = { version = "3.13.*", channel = "conda-forge" }
+# Same experimental NumPy as ob034; OpenBLAS 0.3.35 is swapped at runtime.
+numpy = { version = "2.5.3.*", build = "py313h9242c33_0" }
+openblas = "0.3.35.*"
+pyjs = "*"
+
+[feature.native]
+platforms = ["linux-64"]
+channels = ["conda-forge"]
+
+[feature.native.dependencies]
+python = "3.12.*"
+numpy = "2.5.2.*"
+libopenblas = "0.3.34.*"

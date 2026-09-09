@@ -28,6 +28,15 @@ MAPPING = [
     {"api": "lstsq", "group": "lapack", "blas": "gelsd"},
 ]
 
+LABEL_NAMES = {
+    "openblas": "emscripten-forge OpenBLAS 0.3.34",
+    "ob034": "emscripten-forge OpenBLAS 0.3.34",
+    "obdev": "emscripten-forge OpenBLAS 0.3.35",
+    "pyodide": "Pyodide NumPy",
+    "noblas": "emscripten-forge NumPy (no-BLAS)",
+    "cf64": "conda-forge linux-64 OpenBLAS 0.3.34",
+}
+
 
 def write_report(
     path: Path,
@@ -39,11 +48,7 @@ def write_report(
 ) -> None:
     def pretty(meta: dict, fallback: str) -> str:
         label = str(meta.get("label") or "")
-        names = {
-            "openblas": "emscripten-forge NumPy",
-            "pyodide": "Pyodide NumPy",
-            "noblas": "emscripten-forge NumPy (no-BLAS)",
-        }
+        names = LABEL_NAMES
         return names.get(label, fallback)
 
     if comparisons is None:

@@ -506,16 +506,10 @@ def main() -> int:
     for dt in REAL_DTYPES:
         for n in control_ns:
 
-            def setup_add(n=n, dt=dt):
-                a = randn((n, n), dt, rng)
-                b = randn((n, n), dt, rng)
-                return lambda: np.add(a, b)
-
             def setup_sum(n=n, dt=dt):
                 a = randn((n, n), dt, rng)
                 return lambda: a.sum()
 
-            go("add", n, dt, "control", "", setup_add, float(n * n))
             go("sum", n, dt, "control", "", setup_sum, float(n * n))
 
     emit_meta({"done": True})
