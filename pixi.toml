@@ -22,6 +22,7 @@ pyjs_code_runner = ">=3.2.0"
 empack = "*"
 playwright-python = "*"
 util-linux = "*"
+matplotlib = "*"
 
 [feature.host.activation.env]
 PLAYWRIGHT_BROWSERS_PATH = "$PIXI_PROJECT_ROOT/.playwright"
@@ -89,7 +90,6 @@ pyjs = "*"
 platforms = ["emscripten-wasm32"]
 channel-priority = "disabled"
 channels = [
-    "https://prefix.dev/emscripten-forge-4x-experimental",
     "https://prefix.dev/emscripten-forge-4x",
     "conda-forge",
 ]
@@ -97,8 +97,8 @@ channels = [
 [feature.wasm-ob034.dependencies]
 python = "3.13.*"
 python_abi = { version = "3.13.*", channel = "conda-forge" }
-# Build pin selects the experimental NumPy that links OpenBLAS (4x 2.5.3 does not).
-numpy = { version = "2.5.3.*", build = "py313h9242c33_0" }
+# Main-channel OpenBLAS-linked NumPy (emscripten-forge/recipes#6310, build 3).
+numpy = { version = "2.5.3.*", build = "py313h9242c33_3" }
 openblas = "0.3.34.*"
 pyjs = "*"
 
@@ -106,6 +106,8 @@ pyjs = "*"
 platforms = ["emscripten-wasm32"]
 channel-priority = "disabled"
 channels = [
+    # Local build of openblas-experimental @ b4100af (emscripten-forge/recipes#6704, build 2).
+    "./local-channel",
     "https://prefix.dev/emscripten-forge-4x-experimental",
     "https://prefix.dev/emscripten-forge-4x",
     "conda-forge",
@@ -114,9 +116,9 @@ channels = [
 [feature.wasm-obdev.dependencies]
 python = "3.13.*"
 python_abi = { version = "3.13.*", channel = "conda-forge" }
-# Same experimental NumPy as ob034; OpenBLAS 0.3.35 is swapped at runtime.
-numpy = { version = "2.5.3.*", build = "py313h9242c33_0" }
-openblas = "0.3.35.*"
+# Same main-channel NumPy as ob034 (emscripten-forge/recipes#6310); OpenBLAS 0.3.35.dev0 from local/#6704.
+numpy = { version = "2.5.3.*", build = "py313h9242c33_3" }
+openblas = { version = "==0.3.35.dev0", build = "h69b678e_2" }
 pyjs = "*"
 
 [feature.native]

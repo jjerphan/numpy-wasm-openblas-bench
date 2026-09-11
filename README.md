@@ -11,8 +11,8 @@ Requires **linux-64**, [pixi](https://pixi.sh/), and enough disk for Chromium.
 ```bash
 pixi run setup             # install all prefixes + Chromium (once)
 pixi run bench-noblas      # emscripten-forge NumPy, no OpenBLAS
-pixi run bench-ob034       # NumPy 2.5.3 + OpenBLAS 0.3.34 (wasm)
-pixi run bench-obdev       # same NumPy + OpenBLAS 0.3.35.dev0 (wasm)
+pixi run bench-ob034       # main-channel NumPy 2.5.3 + OpenBLAS 0.3.34 (wasm)
+pixi run bench-obdev       # same NumPy + OpenBLAS 0.3.35.dev0 (local/#6704 or experimental) (wasm)
 pixi run bench-pyodide     # Pyodide 314.0.5 from the CDN
 pixi run bench-cf64        # conda-forge linux-64, one thread, taskset
 pixi run report            # results/report.html from existing CSVs

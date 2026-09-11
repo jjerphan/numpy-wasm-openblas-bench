@@ -14,11 +14,36 @@ RESULTS = HERE / "results"
 CONFIGS = ("noblas", "ob034", "obdev", "pyodide", "cf64")
 
 
+def _pixi_env_prefixes() -> dict[str, Path]:
+    """Resolve env prefixes, including pixi detached-environments layouts."""
+    try:
+        info = subprocess.check_output(
+            ["pixi", "info", "--json"],
+            cwd=HERE,
+            text=True,
+        )
+        import json
+
+        envs = json.loads(info).get("environments_info") or []
+        out = {}
+        for env in envs:
+            name = env.get("name")
+            prefix = env.get("prefix")
+            if name and prefix:
+                out[name] = Path(prefix)
+        return out
+    except (OSError, subprocess.CalledProcessError, ValueError, KeyError):
+        return {}
+
+
 def require_env(name: str) -> Path:
     path = PIXI_ENVS / name
-    if not path.is_dir():
-        raise SystemExit(f"missing prefix {path}\nRun: pixi run setup")
-    return path
+    if path.is_dir():
+        return path
+    detached = _pixi_env_prefixes().get(name)
+    if detached is not None and detached.is_dir():
+        return detached
+    raise SystemExit(f"missing prefix for env {name!r}\nRun: pixi run setup")
 
 
 def python_script(script: str, argv: list[str]) -> int:
