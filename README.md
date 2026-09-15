@@ -49,8 +49,8 @@ blog measurements; regenerating overwrites them. Missing CSVs are skipped by
 | --- | --- | --- | --- |
 | `bench-noblas` | `.pixi/envs/noblas` | `noblas` | NumPy 2.5.2, no OpenBLAS |
 | `bench-ob034` | `.pixi/envs/ob034` | `ob034` | NumPy 2.5.3 + OpenBLAS 0.3.34 ([recipes#6310](https://github.com/emscripten-forge/recipes/pull/6310)) |
-| `bench-obdev` | `.pixi/envs/obdev` | `obdev` | same NumPy + OpenBLAS `0.3.35.dev0` `simd128_hbf81ecf_3` ([recipes#6761](https://github.com/emscripten-forge/recipes/pull/6761)) |
-| `bench-obdev-relaxed` | `.pixi/envs/obdev-relaxed` | `obdev-relaxed` | OpenBLAS `0.3.35.dev0` `relaxed_simd_h13a9a80_3` ([recipes#6761](https://github.com/emscripten-forge/recipes/pull/6761)) |
+| `bench-obdev` | `.pixi/envs/obdev` | `obdev` | same NumPy + OpenBLAS `0.3.35.dev0` **`simd128_hbf81ecf_3`** ([recipes#6761](https://github.com/emscripten-forge/recipes/pull/6761)) |
+| `bench-obdev-relaxed` | `.pixi/envs/obdev-relaxed` | `obdev-relaxed` | OpenBLAS `0.3.35.dev0` **`relaxed_simd_h13a9a80_3`** ([recipes#6761](https://github.com/emscripten-forge/recipes/pull/6761)) |
 | `bench-pyodide` | Pyodide CDN | `pyodide` | official Pyodide NumPy |
 | `bench-cf64` | `.pixi/envs/cf64` | `cf64` | conda-forge linux-64, one thread, `taskset` |
 

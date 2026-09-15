@@ -11,6 +11,13 @@ HERE = Path(__file__).resolve().parent
 PIXI_ENVS = HERE / ".pixi" / "envs"
 RESULTS = HERE / "results"
 
+# Bench labels (CSV stems / pixi env names, except pyodide which uses the CDN):
+#   noblas         — emscripten-forge NumPy without OpenBLAS
+#   ob034          — NumPy 2.5.3 + OpenBLAS 0.3.34 (main channel, recipes#6310)
+#   obdev          — same NumPy + OpenBLAS 0.3.35.dev0 simd128_hbf81ecf_3 (recipes#6761)
+#   obdev-relaxed  — same NumPy + OpenBLAS 0.3.35.dev0 relaxed_simd_h13a9a80_3 (recipes#6761)
+#   pyodide        — official Pyodide NumPy from the CDN
+#   cf64           — conda-forge linux-64 NumPy + OpenBLAS 0.3.34 (one thread)
 CONFIGS = ("noblas", "ob034", "obdev", "obdev-relaxed", "pyodide", "cf64")
 
 

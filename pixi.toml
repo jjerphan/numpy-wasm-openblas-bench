@@ -126,9 +126,9 @@ channels = [
 [feature.wasm-obdev.dependencies]
 python = "3.13.*"
 python_abi = { version = "3.13.*", channel = "conda-forge" }
-# Same main-channel NumPy as ob034; OpenBLAS 0.3.35.dev0 simd128 (no relaxed SIMD).
+# Same main-channel NumPy as ob034; OpenBLAS 0.3.35.dev0 simd128 (blog: simd128_hbf81ecf_3).
 numpy = { version = "2.5.3.*", build = "py313h9242c33_3" }
-openblas = { version = "==0.3.35.dev0", build = "simd128_*" }
+openblas = { version = "==0.3.35.dev0", build = "simd128_hbf81ecf_3" }
 pyjs = "*"
 
 [feature.wasm-obdev-relaxed]
@@ -145,7 +145,7 @@ channels = [
 python = "3.13.*"
 python_abi = { version = "3.13.*", channel = "conda-forge" }
 numpy = { version = "2.5.3.*", build = "py313h9242c33_3" }
-openblas = { version = "==0.3.35.dev0", build = "relaxed_simd_*" }
+openblas = { version = "==0.3.35.dev0", build = "relaxed_simd_h13a9a80_3" }
 pyjs = "*"
 
 [feature.native]
