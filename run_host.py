@@ -14,7 +14,6 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 PIXI_ENVS = HERE / ".pixi" / "envs"
-DEFAULT_HOST = PIXI_ENVS / "default"
 DEFAULT_OPENBLAS = PIXI_ENVS / "ob034"
 DEFAULT_NOBLAS = PIXI_ENVS / "noblas"
 RESULTS = HERE / "results"
@@ -348,7 +347,7 @@ def main() -> int:
     p.add_argument(
         "--label",
         default=None,
-        help="jsonl/csv stem when --only names a single env (default: openblas or noblas)",
+        help="jsonl/csv stem when --only names a single env (default: ob034 or noblas)",
     )
     p.add_argument("--max-n", type=int, default=1024)
     p.add_argument("--warmup", type=int, default=5)
@@ -376,7 +375,7 @@ def main() -> int:
     metas = {}
     jobs = []
     if args.only in ("openblas", "both"):
-        label = args.label if args.label and args.only == "openblas" else "openblas"
+        label = args.label if args.label and args.only == "openblas" else "ob034"
         jobs.append((label, args.openblas_env, True))
     if args.only in ("noblas", "both"):
         jobs.append(("noblas", args.noblas_env, False))
@@ -401,10 +400,10 @@ def main() -> int:
 
     # Always convert jsonls if present so --only / --resume cannot
     # pair a full run against a stale smoke-test CSV.
-    labels = [j[0] for j in jobs] if jobs else ["openblas", "noblas"]
+    labels = [j[0] for j in jobs] if jobs else ["ob034", "noblas"]
     if args.skip_run:
         extra = [args.label] if args.label else []
-        labels = list(dict.fromkeys([*labels, *extra, "openblas", "noblas"]))
+        labels = list(dict.fromkeys([*labels, *extra, "ob034", "noblas"]))
     for label in labels:
         jsonl = RESULTS / f"{label}.jsonl"
         if jsonl.exists():
@@ -413,7 +412,7 @@ def main() -> int:
     from compare import compare_and_report
 
     if args.compare_pyodide:
-        stem = args.label or "openblas"
+        stem = args.label or "ob034"
         left = RESULTS / f"{stem}.csv"
         if left.exists() and (RESULTS / "pyodide.csv").exists():
             compare_and_report(
@@ -427,13 +426,13 @@ def main() -> int:
 
     if (
         not args.no_compare
-        and (RESULTS / "openblas.csv").exists()
+        and (RESULTS / "ob034.csv").exists()
         and (RESULTS / "noblas.csv").exists()
     ):
         compare_and_report(
-            RESULTS / "openblas.csv",
+            RESULTS / "ob034.csv",
             RESULTS / "noblas.csv",
-            RESULTS / "openblas.meta.json" if (RESULTS / "openblas.meta.json").exists() else None,
+            RESULTS / "ob034.meta.json" if (RESULTS / "ob034.meta.json").exists() else None,
             RESULTS / "noblas.meta.json" if (RESULTS / "noblas.meta.json").exists() else None,
             RESULTS / "compare.csv",
             RESULTS / "report_noblas.html",

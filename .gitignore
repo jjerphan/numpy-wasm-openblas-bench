@@ -10,5 +10,6 @@ results/*.html
 results/*.jsonl
 results/*.log
 results/*.meta.json
+results/compare*.csv
 *.wasm
 work/

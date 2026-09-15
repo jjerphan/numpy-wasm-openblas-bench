@@ -10,6 +10,7 @@ default = { features = ["host"] }
 noblas = { features = ["wasm-noblas"], no-default-feature = true }
 ob034 = { features = ["wasm-ob034"], no-default-feature = true }
 obdev = { features = ["wasm-obdev"], no-default-feature = true }
+obdev-relaxed = { features = ["wasm-obdev-relaxed"], no-default-feature = true }
 cf64 = { features = ["native"], no-default-feature = true }
 
 [feature.host]
@@ -55,6 +56,13 @@ depends-on = ["install-obdev"]
 [feature.host.tasks.install-obdev]
 cmd = "pixi install -e obdev"
 
+[feature.host.tasks.bench-obdev-relaxed]
+cmd = "python cli.py bench obdev-relaxed"
+depends-on = ["install-obdev-relaxed"]
+
+[feature.host.tasks.install-obdev-relaxed]
+cmd = "pixi install -e obdev-relaxed"
+
 [feature.host.tasks.bench-pyodide]
 cmd = "python cli.py bench pyodide"
 
@@ -67,6 +75,9 @@ depends-on = ["install-cf64"]
 
 [feature.host.tasks.report]
 cmd = "python cli.py report"
+
+[feature.host.tasks.plot-blog]
+cmd = "python cli.py plot-blog"
 
 [feature.host.tasks.all]
 cmd = "python cli.py all"
@@ -106,8 +117,7 @@ pyjs = "*"
 platforms = ["emscripten-wasm32"]
 channel-priority = "disabled"
 channels = [
-    # Local build of openblas-experimental @ b4100af (emscripten-forge/recipes#6704, build 2).
-    "./local-channel",
+    # OpenBLAS 0.3.35.dev0 simd128 from emscripten-forge/recipes#6761.
     "https://prefix.dev/emscripten-forge-4x-experimental",
     "https://prefix.dev/emscripten-forge-4x",
     "conda-forge",
@@ -116,9 +126,26 @@ channels = [
 [feature.wasm-obdev.dependencies]
 python = "3.13.*"
 python_abi = { version = "3.13.*", channel = "conda-forge" }
-# Same main-channel NumPy as ob034 (emscripten-forge/recipes#6310); OpenBLAS 0.3.35.dev0 from local/#6704.
+# Same main-channel NumPy as ob034; OpenBLAS 0.3.35.dev0 simd128 (no relaxed SIMD).
 numpy = { version = "2.5.3.*", build = "py313h9242c33_3" }
-openblas = { version = "==0.3.35.dev0", build = "h69b678e_2" }
+openblas = { version = "==0.3.35.dev0", build = "simd128_*" }
+pyjs = "*"
+
+[feature.wasm-obdev-relaxed]
+platforms = ["emscripten-wasm32"]
+channel-priority = "disabled"
+channels = [
+    # OpenBLAS 0.3.35.dev0 relaxed_simd from emscripten-forge/recipes#6761.
+    "https://prefix.dev/emscripten-forge-4x-experimental",
+    "https://prefix.dev/emscripten-forge-4x",
+    "conda-forge",
+]
+
+[feature.wasm-obdev-relaxed.dependencies]
+python = "3.13.*"
+python_abi = { version = "3.13.*", channel = "conda-forge" }
+numpy = { version = "2.5.3.*", build = "py313h9242c33_3" }
+openblas = { version = "==0.3.35.dev0", build = "relaxed_simd_*" }
 pyjs = "*"
 
 [feature.native]

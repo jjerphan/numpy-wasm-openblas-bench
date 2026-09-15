@@ -29,9 +29,9 @@ MAPPING = [
 ]
 
 LABEL_NAMES = {
-    "openblas": "emscripten-forge OpenBLAS 0.3.34",
     "ob034": "emscripten-forge OpenBLAS 0.3.34",
-    "obdev": "emscripten-forge OpenBLAS 0.3.35",
+    "obdev": "emscripten-forge OpenBLAS 0.3.35 (SIMD128)",
+    "obdev-relaxed": "emscripten-forge OpenBLAS 0.3.35 (Relaxed SIMD)",
     "pyodide": "Pyodide NumPy",
     "noblas": "emscripten-forge NumPy (no-BLAS)",
     "cf64": "conda-forge linux-64 OpenBLAS 0.3.34",

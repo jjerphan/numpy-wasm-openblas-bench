@@ -191,31 +191,20 @@ COMPARE_PAIRS = (
     ("obdev", "ob034"),
     ("obdev", "pyodide"),
     ("obdev", "cf64"),
+    ("obdev-relaxed", "obdev"),
+    ("obdev-relaxed", "noblas"),
+    ("obdev-relaxed", "cf64"),
 )
-
-_ALIASES = {"ob034": ("openblas",)}
 
 
 def _labelled_csv(results: Path, stem: str) -> Path | None:
     path = results / f"{stem}.csv"
-    if path.exists():
-        return path
-    for alias in _ALIASES.get(stem, ()):
-        alt = results / f"{alias}.csv"
-        if alt.exists():
-            return alt
-    return None
+    return path if path.exists() else None
 
 
 def _labelled_meta(results: Path, stem: str) -> Path | None:
     path = results / f"{stem}.meta.json"
-    if path.exists():
-        return path
-    for alias in _ALIASES.get(stem, ()):
-        alt = results / f"{alias}.meta.json"
-        if alt.exists():
-            return alt
-    return None
+    return path if path.exists() else None
 
 
 def write_combined_index(results: Path) -> None:
@@ -251,7 +240,7 @@ def write_combined_index(results: Path) -> None:
 
 def main() -> int:
     p = argparse.ArgumentParser()
-    p.add_argument("openblas", nargs="?", type=Path, default=HERE / "results" / "openblas.csv")
+    p.add_argument("openblas", nargs="?", type=Path, default=HERE / "results" / "ob034.csv")
     p.add_argument("noblas", nargs="?", type=Path, default=HERE / "results" / "noblas.csv")
     p.add_argument("-o", "--output", type=Path, default=HERE / "results" / "compare.csv")
     p.add_argument("--report", type=Path, default=HERE / "results" / "report.html")

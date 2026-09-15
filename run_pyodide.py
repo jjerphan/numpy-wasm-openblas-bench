@@ -255,15 +255,18 @@ def main() -> int:
             raise RuntimeError("pyodide wasm run did not finish")
 
     jsonl_to_csv(jsonl, RESULTS / "pyodide.csv", max_n=args.max_n)
-    jsonl_to_csv(RESULTS / "openblas.jsonl", RESULTS / "openblas_n1024.csv", max_n=args.max_n)
     if args.no_compare:
         return 0
     from compare import compare_and_report
 
+    left = RESULTS / "ob034.csv"
+    if not left.exists():
+        print(f"skip compare: missing {left}")
+        return 0
     compare_and_report(
-        RESULTS / "openblas_n1024.csv",
+        left,
         RESULTS / "pyodide.csv",
-        RESULTS / "openblas.meta.json" if (RESULTS / "openblas.meta.json").exists() else None,
+        RESULTS / "ob034.meta.json" if (RESULTS / "ob034.meta.json").exists() else None,
         RESULTS / "pyodide.meta.json" if (RESULTS / "pyodide.meta.json").exists() else None,
         RESULTS / "compare_pyodide.csv",
         RESULTS / "report_pyodide.html",

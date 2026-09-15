@@ -258,7 +258,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/python_abi-3.13-9_cp313.conda
   obdev:
     channels:
-    - url: file:///home/jjerphan/dev/numpy-wasm-openblas-bench/local-channel/
     - url: https://prefix.dev/emscripten-forge-4x-experimental/
     - url: https://prefix.dev/emscripten-forge-4x/
     - url: https://conda.anaconda.org/conda-forge/
@@ -269,12 +268,30 @@ environments:
       emscripten-wasm32:
       - conda: https://prefix.dev/emscripten-forge-4x/noarch/emscripten-abi-4.0.9-h267e887_9.tar.bz2
       - conda: https://prefix.dev/emscripten-forge-4x/emscripten-wasm32/numpy-2.5.3-py313h9242c33_3.tar.bz2
+      - conda: https://prefix.dev/emscripten-forge-4x-experimental/emscripten-wasm32/openblas-0.3.35.dev0-simd128_hbf81ecf_3.tar.bz2
       - conda: https://prefix.dev/emscripten-forge-4x/emscripten-wasm32/pyjs-4.0.6-hc286ada_0.tar.bz2
       - conda: https://prefix.dev/emscripten-forge-4x/emscripten-wasm32/pyjs-dev-4.0.6-py313h06ab7c0_0.tar.bz2
       - conda: https://prefix.dev/emscripten-forge-4x/emscripten-wasm32/pyjs-rt-4.0.6-py313h06ab7c0_0.tar.bz2
       - conda: https://prefix.dev/emscripten-forge-4x/emscripten-wasm32/python-3.13.1-h_2efca29_11_cp313.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/noarch/python_abi-3.13-9_cp313.conda
-      - conda: /home/jjerphan/dev/numpy-wasm-openblas-bench/local-channel/emscripten-wasm32/openblas-0.3.35.dev0-h69b678e_2.tar.bz2
+  obdev-relaxed:
+    channels:
+    - url: https://prefix.dev/emscripten-forge-4x-experimental/
+    - url: https://prefix.dev/emscripten-forge-4x/
+    - url: https://conda.anaconda.org/conda-forge/
+    options:
+      channel-priority: disabled
+      pypi-prerelease-mode: if-necessary-or-explicit
+    packages:
+      emscripten-wasm32:
+      - conda: https://prefix.dev/emscripten-forge-4x/noarch/emscripten-abi-4.0.9-h267e887_9.tar.bz2
+      - conda: https://prefix.dev/emscripten-forge-4x/emscripten-wasm32/numpy-2.5.3-py313h9242c33_3.tar.bz2
+      - conda: https://prefix.dev/emscripten-forge-4x-experimental/emscripten-wasm32/openblas-0.3.35.dev0-relaxed_simd_h13a9a80_3.tar.bz2
+      - conda: https://prefix.dev/emscripten-forge-4x/emscripten-wasm32/pyjs-4.0.6-hc286ada_0.tar.bz2
+      - conda: https://prefix.dev/emscripten-forge-4x/emscripten-wasm32/pyjs-dev-4.0.6-py313h06ab7c0_0.tar.bz2
+      - conda: https://prefix.dev/emscripten-forge-4x/emscripten-wasm32/pyjs-rt-4.0.6-py313h06ab7c0_0.tar.bz2
+      - conda: https://prefix.dev/emscripten-forge-4x/emscripten-wasm32/python-3.13.1-h_2efca29_11_cp313.tar.bz2
+      - conda: https://conda.anaconda.org/conda-forge/noarch/python_abi-3.13-9_cp313.conda
 packages:
 - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
   build_number: 20
@@ -1719,16 +1736,24 @@ packages:
   license: BSD-3-Clause
   size: 2402187
   timestamp: 1789118344792
-- conda: /home/jjerphan/dev/numpy-wasm-openblas-bench/local-channel/emscripten-wasm32/openblas-0.3.35.dev0-h69b678e_2.tar.bz2
-  subdir: emscripten-wasm32
-  sha256: 1a0a449a683254950addbf6e7cfa05de073557b5ee0121a5d3326fa559365689
-  md5: c9971e6a633685eafccfbfd80ebf4194
+- conda: https://prefix.dev/emscripten-forge-4x-experimental/emscripten-wasm32/openblas-0.3.35.dev0-relaxed_simd_h13a9a80_3.tar.bz2
+  sha256: aeac18b97f0dff13e7213a065f3ae0c652c91cd5ecfc48049a628b30101f8466
+  md5: 7704f4c84f0f8cea4ebeb5c6c5c607fb
   depends:
   - emscripten-abi >=4,<5.0a0
-  channel: file:///home/jjerphan/dev/numpy-wasm-openblas-bench/local-channel
+  track_features:
+  - openblas-p-0
   license: BSD-3-Clause
-  size: 5589517
-  timestamp: 1789135794014
+  size: 5586418
+  timestamp: 1789479368506
+- conda: https://prefix.dev/emscripten-forge-4x-experimental/emscripten-wasm32/openblas-0.3.35.dev0-simd128_hbf81ecf_3.tar.bz2
+  sha256: b4bc0f2e72e2cb6bb65766a91ca0e910b7dbb6fa352fae3600a3290d6b4659be
+  md5: 9a70d6ed63e4f8f7b22ee09d34c46bba
+  depends:
+  - emscripten-abi >=4,<5.0a0
+  license: BSD-3-Clause
+  size: 5591777
+  timestamp: 1789479368506
 - conda: https://prefix.dev/emscripten-forge-4x/emscripten-wasm32/openblas-0.3.34-h69b678e_3.tar.bz2
   sha256: 7df92ba131954216de9728006697ffde644948934c605c2061a8a0a73f15a3dc
   md5: 0dc8155083259e07822c6789b309e6d0

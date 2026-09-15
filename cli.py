@@ -1,4 +1,4 @@
-"""Pixi entry point: run labelled benches and write results/report.html."""
+"""Pixi entry point: run labelled benches, HTML report, and blog figures."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ HERE = Path(__file__).resolve().parent
 PIXI_ENVS = HERE / ".pixi" / "envs"
 RESULTS = HERE / "results"
 
-CONFIGS = ("noblas", "ob034", "obdev", "pyodide", "cf64")
+CONFIGS = ("noblas", "ob034", "obdev", "obdev-relaxed", "pyodide", "cf64")
 
 
 def _pixi_env_prefixes() -> dict[str, Path]:
@@ -97,9 +97,6 @@ def convert_jsonls() -> None:
         jsonl = RESULTS / f"{stem}.jsonl"
         if jsonl.exists():
             jsonl_to_csv(jsonl, RESULTS / f"{stem}.csv")
-    openblas = RESULTS / "openblas.jsonl"
-    if openblas.exists() and not (RESULTS / "ob034.jsonl").exists():
-        jsonl_to_csv(openblas, RESULTS / "openblas.csv")
 
 
 def report() -> int:
@@ -114,18 +111,31 @@ def report() -> int:
     return 0
 
 
+def plot_blog(rest: list[str] | None = None) -> int:
+    return python_script("plot_blog.py", list(rest or []))
+
+
 def all_configs(full: bool, rest: list[str]) -> int:
     for config in CONFIGS:
         print(f"=== bench {config} ===", flush=True)
         rc = bench(config, full, rest)
         if rc != 0:
             return rc
-    return report()
+    rc = report()
+    if rc != 0:
+        return rc
+    print("=== plot-blog ===", flush=True)
+    return plot_blog()
 
 
 def main(argv: list[str] | None = None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    # Forward plot-blog flags (e.g. --out) without treating them as a config.
+    if argv and argv[0] == "plot-blog":
+        return plot_blog(argv[1:])
+
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("command", choices=("bench", "report", "all"))
+    p.add_argument("command", choices=("bench", "report", "plot-blog", "all"))
     p.add_argument("config", nargs="?", choices=CONFIGS)
     p.add_argument(
         "--full",
@@ -135,6 +145,8 @@ def main(argv: list[str] | None = None) -> int:
     args, rest = p.parse_known_args(argv)
     if args.command == "report":
         return report()
+    if args.command == "plot-blog":
+        return plot_blog(rest)
     if args.command == "all":
         return all_configs(args.full, rest)
     if args.command == "bench":
