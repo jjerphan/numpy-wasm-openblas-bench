@@ -18,7 +18,18 @@ RESULTS = HERE / "results"
 #   obdev-relaxed  — same NumPy + OpenBLAS 0.3.35.dev0 relaxed_simd_h13a9a80_3 (recipes#6761)
 #   pyodide        — official Pyodide NumPy from the CDN
 #   cf64           — conda-forge linux-64 NumPy + OpenBLAS 0.3.34 (one thread)
-CONFIGS = ("noblas", "ob034", "obdev", "obdev-relaxed", "pyodide", "cf64")
+#   em6x-32        — emscripten 6.x NumPy 2.5.4 + OpenBLAS 0.3.34, wasm32
+#   em6x-64        — emscripten 6.x NumPy 2.5.4 + OpenBLAS 0.3.34, wasm64
+CONFIGS = (
+    "noblas",
+    "ob034",
+    "obdev",
+    "obdev-relaxed",
+    "pyodide",
+    "cf64",
+    "em6x-32",
+    "em6x-64",
+)
 
 
 def _pixi_env_prefixes() -> dict[str, Path]:

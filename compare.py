@@ -194,6 +194,9 @@ COMPARE_PAIRS = (
     ("obdev-relaxed", "obdev"),
     ("obdev-relaxed", "noblas"),
     ("obdev-relaxed", "cf64"),
+    ("em6x-32", "ob034"),
+    ("em6x-64", "em6x-32"),
+    ("em6x-64", "ob034"),
 )
 
 
