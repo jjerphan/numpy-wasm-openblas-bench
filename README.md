@@ -35,6 +35,8 @@ pixi run bench-obdev
 pixi run bench-obdev-relaxed
 pixi run bench-pyodide
 pixi run bench-cf64
+pixi run bench-em6x-32
+pixi run bench-em6x-64
 pixi run report       # results/report.html from existing CSVs
 pixi run plot-blog    # results/blog/*.svg + appendix_tables.md
 ```
@@ -53,10 +55,13 @@ blog measurements; regenerating overwrites them. Missing CSVs are skipped by
 | `bench-obdev-relaxed` | `.pixi/envs/obdev-relaxed` | `obdev-relaxed` | OpenBLAS `0.3.35.dev0` **`relaxed_simd_h13a9a80_3`** ([recipes#6761](https://github.com/emscripten-forge/recipes/pull/6761)) |
 | `bench-pyodide` | Pyodide CDN | `pyodide` | official Pyodide NumPy |
 | `bench-cf64` | `.pixi/envs/cf64` | `cf64` | conda-forge linux-64, one thread, `taskset` |
+| `bench-em6x-32` | `.pixi/envs/em6x-32` | `em6x-32` | emscripten 6.x NumPy 2.5.4 + OpenBLAS 0.3.34, `emscripten-wasm32` |
+| `bench-em6x-64` | `.pixi/envs/em6x-64` | `em6x-64` | emscripten 6.x NumPy 2.5.4 + OpenBLAS 0.3.34, `emscripten-wasm64` |
 
 OpenBLAS 0.3.35 packages come from
 [`emscripten-forge-4x-experimental`](https://prefix.dev/channels/emscripten-forge-4x-experimental)
-on prefix.dev (no local channel required).
+on prefix.dev (no local channel required). The `em6x-*` packages come from
+[`emscripten-forge-bot/emscripten-forge-6x`](https://prefix.dev/channels/emscripten-forge-bot/emscripten-forge-6x).
 
 ## Scripts
 

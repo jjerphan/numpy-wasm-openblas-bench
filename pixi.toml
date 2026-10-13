@@ -3,7 +3,7 @@ name = "numpy-wasm-openblas-bench"
 version = "0.1.0"
 description = "Reproduce NumPy wasm OpenBLAS benches and write a self-contained HTML report."
 channels = ["conda-forge"]
-platforms = ["linux-64", "emscripten-wasm32"]
+platforms = ["linux-64", "emscripten-wasm32", "emscripten-wasm64"]
 
 [environments]
 default = { features = ["host"] }
@@ -12,6 +12,8 @@ ob034 = { features = ["wasm-ob034"], no-default-feature = true }
 obdev = { features = ["wasm-obdev"], no-default-feature = true }
 obdev-relaxed = { features = ["wasm-obdev-relaxed"], no-default-feature = true }
 cf64 = { features = ["native"], no-default-feature = true }
+em6x-32 = { features = ["wasm-em6x-32"], no-default-feature = true }
+em6x-64 = { features = ["wasm-em6x-64"], no-default-feature = true }
 
 [feature.host]
 platforms = ["linux-64"]
@@ -29,7 +31,16 @@ matplotlib = "*"
 PLAYWRIGHT_BROWSERS_PATH = "$PIXI_PROJECT_ROOT/.playwright"
 
 [feature.host.tasks.install-envs]
+# `--all` skips the wasm envs (pixi needs an explicit --platform for them).
 cmd = "pixi install --all"
+depends-on = [
+    "install-noblas",
+    "install-ob034",
+    "install-obdev",
+    "install-obdev-relaxed",
+    "install-em6x-32",
+    "install-em6x-64",
+]
 
 [feature.host.tasks.setup]
 cmd = "python -m playwright install chromium"
@@ -40,28 +51,28 @@ cmd = "python cli.py bench noblas"
 depends-on = ["install-noblas"]
 
 [feature.host.tasks.install-noblas]
-cmd = "pixi install -e noblas"
+cmd = "pixi install -e noblas --platform emscripten-wasm32"
 
 [feature.host.tasks.bench-ob034]
 cmd = "python cli.py bench ob034"
 depends-on = ["install-ob034"]
 
 [feature.host.tasks.install-ob034]
-cmd = "pixi install -e ob034"
+cmd = "pixi install -e ob034 --platform emscripten-wasm32"
 
 [feature.host.tasks.bench-obdev]
 cmd = "python cli.py bench obdev"
 depends-on = ["install-obdev"]
 
 [feature.host.tasks.install-obdev]
-cmd = "pixi install -e obdev"
+cmd = "pixi install -e obdev --platform emscripten-wasm32"
 
 [feature.host.tasks.bench-obdev-relaxed]
 cmd = "python cli.py bench obdev-relaxed"
 depends-on = ["install-obdev-relaxed"]
 
 [feature.host.tasks.install-obdev-relaxed]
-cmd = "pixi install -e obdev-relaxed"
+cmd = "pixi install -e obdev-relaxed --platform emscripten-wasm32"
 
 [feature.host.tasks.bench-pyodide]
 cmd = "python cli.py bench pyodide"
@@ -72,6 +83,20 @@ cmd = "pixi install -e cf64"
 [feature.host.tasks.bench-cf64]
 cmd = "python cli.py bench cf64"
 depends-on = ["install-cf64"]
+
+[feature.host.tasks.install-em6x-32]
+cmd = "pixi install -e em6x-32 --platform emscripten-wasm32"
+
+[feature.host.tasks.bench-em6x-32]
+cmd = "python cli.py bench em6x-32"
+depends-on = ["install-em6x-32"]
+
+[feature.host.tasks.install-em6x-64]
+cmd = "pixi install -e em6x-64 --platform emscripten-wasm64"
+
+[feature.host.tasks.bench-em6x-64]
+cmd = "python cli.py bench em6x-64"
+depends-on = ["install-em6x-64"]
 
 [feature.host.tasks.report]
 cmd = "python cli.py report"
@@ -147,6 +172,42 @@ python_abi = { version = "3.13.*", channel = "conda-forge" }
 numpy = { version = "2.5.3.*", build = "py313h9242c33_3" }
 openblas = { version = "==0.3.35.dev0", build = "relaxed_simd_h13a9a80_3" }
 pyjs = "*"
+
+[feature.wasm-em6x-32]
+platforms = ["emscripten-wasm32"]
+channel-priority = "disabled"
+channels = [
+    # emscripten 6.x builds; NumPy is linked against OpenBLAS 0.3.34.
+    "https://prefix.dev/emscripten-forge-bot/emscripten-forge-6x",
+    "conda-forge",
+]
+
+[feature.wasm-em6x-32.dependencies]
+python = "3.14.*"
+python_abi = { version = "3.14.*", channel = "conda-forge" }
+numpy = "2.5.4.*"
+openblas = "0.3.34.*"
+pyjs = "*"
+# 6x pyjs is Python-only; this provides lib_js/pyjs/pyjs_runtime_browser.{js,wasm}.
+libpyjs-static = "*"
+
+[feature.wasm-em6x-64]
+platforms = ["emscripten-wasm64"]
+channel-priority = "disabled"
+channels = [
+    # Same as wasm-em6x-32 but 64-bit (memory64) builds.
+    "https://prefix.dev/emscripten-forge-bot/emscripten-forge-6x",
+    "conda-forge",
+]
+
+[feature.wasm-em6x-64.dependencies]
+python = "3.14.*"
+python_abi = { version = "3.14.*", channel = "conda-forge" }
+numpy = "2.5.4.*"
+openblas = "0.3.34.*"
+pyjs = "*"
+# 6x pyjs is Python-only; this provides lib_js/pyjs/pyjs_runtime_browser.{js,wasm}.
+libpyjs-static = "*"
 
 [feature.native]
 platforms = ["linux-64"]

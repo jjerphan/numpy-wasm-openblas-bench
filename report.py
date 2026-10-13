@@ -35,6 +35,8 @@ LABEL_NAMES = {
     "pyodide": "Pyodide NumPy",
     "noblas": "emscripten-forge NumPy (no-BLAS)",
     "cf64": "conda-forge linux-64 OpenBLAS 0.3.34",
+    "em6x-32": "emscripten-forge 6x OpenBLAS 0.3.34 (wasm32)",
+    "em6x-64": "emscripten-forge 6x OpenBLAS 0.3.34 (wasm64)",
 }
 
 
